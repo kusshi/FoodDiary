@@ -18,15 +18,15 @@ public class MyData {
 	@NotNull	// ●
 	private long id;
 
-	@Column(nullable = true)
+	@Column
 	@NotEmpty	// ●
 	private String foodName;
 
-	@Column(nullable = true)
-	@NotEmpty	// ●
+	@Column
+	@NotNull	// ●
 	private Integer foodCalorie;
 
-	@Column(nullable = true)
+	@Column
 	@NotEmpty	// ●
 	private String time;
 

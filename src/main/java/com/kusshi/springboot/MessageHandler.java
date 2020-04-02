@@ -16,6 +16,8 @@ import com.linecorp.bot.model.message.template.ConfirmTemplate;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 
+import java.util.Date;
+
 @LineMessageHandler
 public class MessageHandler {
 
@@ -84,6 +86,9 @@ public class MessageHandler {
 				myData.setFoodCalorie(foodCalorie);
 				currentState = currentState.record();
 				// ここでタイムスタンプ取得，その後DBにflushして終了
+				Date time = new Date();
+				myData.setTime(time.toString());
+				repository.saveAndFlush(myData);
 				return new TextMessage(foodName + foodCalorie + "を登録しました");
 			}else {
 				foodCalorie = 0;
