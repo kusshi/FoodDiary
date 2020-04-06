@@ -1,6 +1,7 @@
 package com.kusshi.springboot;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kusshi.springboot.repositories.MyDataRepository;
 import com.kusshi.springboot.StatePattern;
@@ -17,6 +18,7 @@ import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 
 import java.util.Date;
+
 
 @LineMessageHandler
 public class MessageHandler {
@@ -122,7 +124,8 @@ public class MessageHandler {
 			
 		case END_RECORDING_FOOD:
 			if(event.getMessage().getText().equals("はい")) {
-				repository.saveAndFlush(myData);
+				// repository.saveAndFlush(myData);
+				this.changeDB();
 				currentState = currentState.accept();
 				return new TextMessage(foodName + "(" + foodCalorie + ")" + ":" + currentTime + "を登録しました");
 			}else {
@@ -150,6 +153,11 @@ public class MessageHandler {
 	public Message handleDefaultMessageEvent(Event event) {
 		System.out.println("event: " + event);
 		return new TextMessage("テキストメッセージで入力してください");
+	}
+	
+	@Transactional(readOnly=false)
+	private void changeDB () {
+		repository.saveAndFlush(myData);
 	}
 
 }
