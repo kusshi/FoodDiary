@@ -30,6 +30,7 @@ public class MessageHandler {
 
 	String foodName = "";
 	int foodCalorie = 0;
+	String currentTime = "";
 
 	// テキストメッセージ受信時のイベント
 	@EventMapping
@@ -39,19 +40,31 @@ public class MessageHandler {
 
 		switch(currentState) {
 		case INITIAL:
-			
 			if(event.getMessage().getText().equals("登録")) {
-				currentState = currentState.accept();
-				return new TextMessage(event.getMessage().getText() + "します");
+				currentState = currentState.record();
+				return new TemplateMessage("入力確認用テンプレートメッセージ",
+						new ConfirmTemplate("登録しますか？",
+								new MessageAction("はい", "はい"),
+								new MessageAction("いいえ", "いいえ")
+								)
+						);
 			}
 			break;
-
-		case WAIT_FOOD_NAME:
 			
+		case START_RECORDIG_FOOD:
+			if(event.getMessage().getText().equals("はい")) {
+				currentState = currentState.accept();
+				return new TextMessage("食品名を入力してください");
+			}else {
+				currentState = currentState.cancel();
+				return new TextMessage("キャンセルします");
+			}
+			
+		case WAIT_FOOD_NAME:
 			foodName = event.getMessage().getText();
-			currentState = currentState.record();
+			currentState = currentState.accept();
 			return new TemplateMessage("入力確認用テンプレートメッセージ",
-					new ConfirmTemplate(event.getMessage().getText(),
+					new ConfirmTemplate(event.getMessage().getText() + "でよろしいですか？",
 							new MessageAction("はい", "はい"),
 							new MessageAction("いいえ", "いいえ")
 							)
@@ -61,41 +74,58 @@ public class MessageHandler {
 			System.out.println("event: " + event.getMessage().getText());
 			if(event.getMessage().getText().equals("はい")) {
 				myData.setFoodName(foodName);
-				currentState = currentState.record();
-				return new TextMessage("カロリー[kcal]を整数で入力してください");
+				currentState = currentState.accept();
+				return new TextMessage("食品のカロリー[kcal]を整数で入力してください");
 			}else {
 				foodName = "";
 				currentState = currentState.cancel();
+				return new TextMessage("キャンセルします");
 			}
-			break;
 
 		case WAIT_FOOD_CALORIE:
-			
 			foodCalorie = Integer.parseInt(event.getMessage().getText());
-			currentState = currentState.record();
+			currentState = currentState.accept();
 			return new TemplateMessage("入力確認用テンプレートメッセージ",
-					new ConfirmTemplate(event.getMessage().getText(),
+					new ConfirmTemplate(event.getMessage().getText() + "でよろしいですか？",
 							new MessageAction("はい", "はい"),
 							new MessageAction("いいえ", "いいえ")
 							)
 					);
 
 		case SET_FOOD_CALORIE:
-			
 			if(event.getMessage().getText().equals("はい")) {
 				myData.setFoodCalorie(foodCalorie);
-				currentState = currentState.record();
-				// ここでタイムスタンプ取得，その後DBにflushして終了
+				// ここでタイムスタンプ取得
 				Date time = new Date();
-				myData.setTime(time.toString());
-				repository.saveAndFlush(myData);
-				return new TextMessage(foodName + foodCalorie + "を登録しました");
+				currentTime = time.toString();
+				myData.setTime(currentTime);
+				currentState = currentState.accept();
+				return new TemplateMessage("入力確認用テンプレートメッセージ",
+						new ConfirmTemplate(foodName + "(" + foodCalorie + ")" + ":" + currentTime + "を登録しますか？",
+								new MessageAction("はい", "はい"),
+								new MessageAction("いいえ", "いいえ")
+								)
+						);
 			}else {
 				foodCalorie = 0;
 				currentState = currentState.cancel();
+				return new TextMessage("キャンセルします");
 			}
-			break;
+			
+		case END_RECORDING_FOOD:
+			if(event.getMessage().getText().equals("はい")) {
+				repository.saveAndFlush(myData);
+				currentState = currentState.accept();
+				return new TextMessage(foodName + "(" + foodCalorie + ")" + ":" + currentTime + "を登録しました");
+			}else {
+				foodCalorie = 0;
+				currentState = currentState.cancel();
+				return new TextMessage("キャンセルします");
+			}
+			
+			
 		}
+		
 		return new TextMessage(event.getMessage().getText());
 	}
 

@@ -4,6 +4,18 @@ public enum State {
 	
 	INITIAL {
 		@Override
+		public State record() {
+			return START_RECORDIG_FOOD;
+		}
+		
+		@Override 
+		public State cancel() {
+			return INITIAL;
+		}
+	},
+	
+	START_RECORDIG_FOOD {
+		@Override
 		public State accept() {
 			return WAIT_FOOD_NAME;
 		}
@@ -16,7 +28,7 @@ public enum State {
 
 	WAIT_FOOD_NAME {
 		@Override
-		public State record() {
+		public State accept() {
 			return SET_FOOD_NAME;
 		}
 		
@@ -28,7 +40,7 @@ public enum State {
 	
 	SET_FOOD_NAME {
 		@Override
-		public State record() {
+		public State accept() {
 			return WAIT_FOOD_CALORIE;
 		}
 		
@@ -40,7 +52,7 @@ public enum State {
 	
 	WAIT_FOOD_CALORIE {
 		@Override
-		public State record() {
+		public State accept() {
 			return SET_FOOD_CALORIE;
 		}
 		
@@ -53,7 +65,20 @@ public enum State {
 	
 	SET_FOOD_CALORIE {
 		@Override
-		public State record() {
+		public State accept() {
+			return END_RECORDING_FOOD;
+		}
+		
+		@Override 
+		public State cancel() {
+			return INITIAL;
+		}
+		
+	},
+	
+	END_RECORDING_FOOD {
+		@Override
+		public State accept() {
 			return INITIAL;
 		}
 		
@@ -68,12 +93,14 @@ public enum State {
 		throw new IllegalStateException();
 	}
 	
+	public State cancel() {
+		throw new IllegalStateException();
+	}
+	
 	public State record() {
 		throw new IllegalStateException();
 	}
 	
-	public State cancel() {
-		throw new IllegalStateException();
-	}
+
 
 }
