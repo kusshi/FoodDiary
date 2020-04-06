@@ -48,6 +48,14 @@ public class MessageHandler {
 								new MessageAction("いいえ", "いいえ")
 								)
 						);
+			} else if(event.getMessage().getText().equals("閲覧")) {
+				currentState = currentState.browse();
+				return new TemplateMessage("入力確認用テンプレートメッセージ",
+						new ConfirmTemplate("記録を閲覧しますか？",
+								new MessageAction("はい", "はい"),
+								new MessageAction("いいえ", "いいえ")
+								)
+						);
 			}
 			break;
 			
@@ -119,6 +127,15 @@ public class MessageHandler {
 				return new TextMessage(foodName + "(" + foodCalorie + ")" + ":" + currentTime + "を登録しました");
 			}else {
 				foodCalorie = 0;
+				currentState = currentState.cancel();
+				return new TextMessage("キャンセルします");
+			}
+			
+		case START_BROWSING_RECORD:
+			if(event.getMessage().getText().equals("はい")) {
+				currentState = currentState.accept();
+				return new TextMessage("閲覧します");
+			}else {
 				currentState = currentState.cancel();
 				return new TextMessage("キャンセルします");
 			}

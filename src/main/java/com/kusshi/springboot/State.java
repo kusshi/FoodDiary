@@ -8,6 +8,11 @@ public enum State {
 			return START_RECORDIG_FOOD;
 		}
 		
+		@Override
+		public State browse() {
+			return START_BROWSING_RECORD;
+		}
+		
 		@Override 
 		public State cancel() {
 			return INITIAL;
@@ -87,6 +92,32 @@ public enum State {
 			return INITIAL;
 		}
 		
+	},
+	
+	START_BROWSING_RECORD {
+		@Override
+		public State accept() {
+			return BROWSE_RECORD;
+		}
+		
+		@Override 
+		public State cancel() {
+			return INITIAL;
+		}
+		
+	},
+	
+	BROWSE_RECORD {
+		@Override
+		public State accept() {
+			return INITIAL;
+		}
+		
+		@Override 
+		public State cancel() {
+			return INITIAL;
+		}
+		
 	};
 
 	public State accept() {
@@ -98,6 +129,9 @@ public enum State {
 	}
 	
 	public State record() {
+		throw new IllegalStateException();
+	}
+	public State browse() {
 		throw new IllegalStateException();
 	}
 	
