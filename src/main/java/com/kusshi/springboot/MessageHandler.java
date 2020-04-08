@@ -5,17 +5,30 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.kusshi.springboot.repositories.MyDataRepository;
 import com.kusshi.springboot.StatePattern;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kusshi.springboot.State;
+import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.action.MessageAction;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
+import com.linecorp.bot.model.message.FlexMessage;
+import com.linecorp.bot.model.message.FlexMessage.FlexMessageBuilder;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.message.flex.component.Box;
+import com.linecorp.bot.model.message.flex.component.Text;
+import com.linecorp.bot.model.message.flex.container.Bubble;
+import com.linecorp.bot.model.message.flex.container.FlexContainer;
+import com.linecorp.bot.model.message.flex.unit.FlexFontSize;
+import com.linecorp.bot.model.message.flex.unit.FlexLayout;
 import com.linecorp.bot.model.message.template.ConfirmTemplate;
+import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
+
+
 
 import java.util.Date;
 
@@ -143,6 +156,23 @@ public class MessageHandler {
 				return new TextMessage("キャンセルします");
 			}
 			
+		case BROWSE_RECORD:
+			Bubble test = new Bubble(null, null, null, null, null, null, null, null);
+			
+			Box body = Box.builder()
+	        .layout(FlexLayout.VERTICAL)
+	        .contents(
+	        		Text.builder()
+	                .text("Test Message")
+	                .size(FlexFontSize.XL)
+	                .weight(Text.TextWeight.BOLD)
+	                .build()
+	        )
+	        .build();
+			Bubble bubble = Bubble.builder()
+				.body(body)
+				.build();
+			return new FlexMessage("hoge", bubble);
 			
 		}
 		
@@ -159,5 +189,5 @@ public class MessageHandler {
 	private void changeDB () {
 		repository.saveAndFlush(myData);
 	}
-
+	
 }
