@@ -159,28 +159,16 @@ public class MessageHandler {
 			}
 			
 		case BROWSE_RECORD:
-			List<Bubble> listBubble = new ArrayList<Bubble>();
-			Box body = Box.builder()
-			        .layout(FlexLayout.VERTICAL)
-			        .contents(
-			        		Text.builder()
-			                .text("Test Message")
-			                .size(FlexFontSize.XL)
-			                .weight(Text.TextWeight.BOLD)
-			                .build()
-			        )
-			        .build();
-			Bubble bubble = Bubble.builder()
-				.body(body)
-				.build();
-			listBubble.add(bubble);
-			listBubble.add(bubble);
-			Carousel testFlexMessage = new Carousel(listBubble);
-			
 			List<MyData> resultFoods = repository.findByFoodCalorieGreaterThan(0);
-			resultFoods.forEach(food -> System.out.println("food: " + food.getFoodName()));
-			return new FlexMessage("hoge", testFlexMessage);
+			List<Bubble> bubbles = new ArrayList<Bubble>();
 			
+			resultFoods.forEach(food -> {
+				System.out.println("food: " + food.getFoodName());
+				bubbles.add(createBubble(food.getFoodName()));
+			});
+
+			Carousel testFlexMessage = new Carousel(bubbles);
+			return new FlexMessage("食品名", testFlexMessage);
 		}
 		
 		return new TextMessage(event.getMessage().getText());
@@ -195,6 +183,22 @@ public class MessageHandler {
 	@Transactional(readOnly=false)
 	private void changeDB () {
 		repository.saveAndFlush(myData);
+	}
+	
+	private Bubble createBubble(String foodName) {
+		Box body = Box.builder()
+		        .layout(FlexLayout.VERTICAL)
+		        .contents(
+		        		Text.builder()
+		                .text(foodName)
+		                .size(FlexFontSize.XL)
+		                .weight(Text.TextWeight.BOLD)
+		                .build()
+		        )
+		        .build();
+		return Bubble.builder()
+			.body(body)
+			.build();
 	}
 	
 }
