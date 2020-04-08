@@ -12,4 +12,5 @@ import org.springframework.stereotype.Repository;
 public interface MyDataRepository extends JpaRepository<MyData, Long> {
 
 	public Optional<MyData> findById(Long id);
+	public List<MyData> findByFoodCalorieGreaterThan(Integer thresholdCalorie);
 }
