@@ -176,6 +176,9 @@ public class MessageHandler {
 			listBubble.add(bubble);
 			listBubble.add(bubble);
 			Carousel testFlexMessage = new Carousel(listBubble);
+			
+			List<MyData> resultFoods = repository.findByFoodCalorieGreaterThan(0);
+			resultFoods.forEach(food -> System.out.println("food: " + food.getFoodName()));
 			return new FlexMessage("hoge", testFlexMessage);
 			
 		}
