@@ -20,6 +20,7 @@ import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.flex.component.Box;
 import com.linecorp.bot.model.message.flex.component.Text;
 import com.linecorp.bot.model.message.flex.container.Bubble;
+import com.linecorp.bot.model.message.flex.container.Carousel;
 import com.linecorp.bot.model.message.flex.container.FlexContainer;
 import com.linecorp.bot.model.message.flex.unit.FlexFontSize;
 import com.linecorp.bot.model.message.flex.unit.FlexLayout;
@@ -28,9 +29,10 @@ import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 
-
-
+import java.awt.CardLayout;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 @LineMessageHandler
@@ -157,22 +159,24 @@ public class MessageHandler {
 			}
 			
 		case BROWSE_RECORD:
-			Bubble test = new Bubble(null, null, null, null, null, null, null, null);
-			
+			List<Bubble> listBubble = new ArrayList<Bubble>();
 			Box body = Box.builder()
-	        .layout(FlexLayout.VERTICAL)
-	        .contents(
-	        		Text.builder()
-	                .text("Test Message")
-	                .size(FlexFontSize.XL)
-	                .weight(Text.TextWeight.BOLD)
-	                .build()
-	        )
-	        .build();
+			        .layout(FlexLayout.VERTICAL)
+			        .contents(
+			        		Text.builder()
+			                .text("Test Message")
+			                .size(FlexFontSize.XL)
+			                .weight(Text.TextWeight.BOLD)
+			                .build()
+			        )
+			        .build();
 			Bubble bubble = Bubble.builder()
 				.body(body)
 				.build();
-			return new FlexMessage("hoge", bubble);
+			listBubble.add(bubble);
+			listBubble.add(bubble);
+			Carousel testFlexMessage = new Carousel(listBubble);
+			return new FlexMessage("hoge", testFlexMessage);
 			
 		}
 		
