@@ -27,8 +27,16 @@ public class MyData {
 	private Integer foodCalorie;
 
 	@Column
-	@NotEmpty	// ●
-	private String time;
+	@NotNull	// ●
+	private Integer year;
+	
+	@Column
+	@NotNull	// ●
+	private Integer month;
+	
+	@Column
+	@NotNull	// ●
+	Integer dayOfMonth;
 
 	public Long getId() {
 		return id;
@@ -48,13 +56,25 @@ public class MyData {
 	public void setFoodCalorie(Integer foodCalorie) {
 		this.foodCalorie = foodCalorie;
 	}
-	public String getTime() {
-		return time;
+	public Integer getYear() {
+		return year;
 	}
-	public void setTime(String time) {
-		this.time = time;
+	public void setYear(Integer year) {
+		this.year = year;
 	}
-	
+	public Integer getMonth() {
+		return month;
+	}
+	public void setMonth(Integer month) {
+		this.month = month;
+	}
+	public Integer getDayOfMonth() {
+		return dayOfMonth;
+	}
+	public void setDayOfMonth(Integer dayOfMonth) {
+		this.dayOfMonth = dayOfMonth;
+	}
+
 	
 
 }

@@ -18,6 +18,7 @@ import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.flex.component.Box;
+import com.linecorp.bot.model.message.flex.component.FlexComponent;
 import com.linecorp.bot.model.message.flex.component.Text;
 import com.linecorp.bot.model.message.flex.container.Bubble;
 import com.linecorp.bot.model.message.flex.container.Carousel;
@@ -31,8 +32,8 @@ import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 
 import java.awt.CardLayout;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.time.LocalDateTime;
 
 
 @LineMessageHandler
@@ -121,12 +122,13 @@ public class MessageHandler {
 			if(event.getMessage().getText().equals("はい")) {
 				myData.setFoodCalorie(foodCalorie);
 				// ここでタイムスタンプ取得
-				Date time = new Date();
-				currentTime = time.toString();
-				myData.setTime(currentTime);
+				LocalDateTime foodRegistrationTime = LocalDateTime.now();
+				myData.setYear(foodRegistrationTime.getYear());
+				myData.setMonth(foodRegistrationTime.getMonthValue());
+				myData.setDayOfMonth(foodRegistrationTime.getDayOfMonth());
 				currentState = currentState.accept();
 				return new TemplateMessage("入力確認用テンプレートメッセージ",
-						new ConfirmTemplate(foodName + "(" + foodCalorie + ")" + ":" + currentTime + "を登録しますか？",
+						new ConfirmTemplate(foodName + "(" + foodCalorie + ")を登録しますか？",
 								new MessageAction("はい", "はい"),
 								new MessageAction("いいえ", "いいえ")
 								)
@@ -142,42 +144,31 @@ public class MessageHandler {
 				// repository.saveAndFlush(myData);
 				this.changeDB();
 				currentState = currentState.accept();
-				return new TextMessage(foodName + "(" + foodCalorie + ")" + ":" + currentTime + "を登録しました");
+				return new TextMessage(foodName + "(" + foodCalorie + ")を登録しました");
 			}else {
 				foodCalorie = 0;
 				currentState = currentState.cancel();
 				return new TextMessage("キャンセルします");
 			}
 			
-		case START_BROWSING_RECORD:
+		case BROWSE_FOOD_RECORD:
 			if(event.getMessage().getText().equals("はい")) {
 				currentState = currentState.accept();
-				return new TextMessage("閲覧します");
+				List<MyData> resultFoods = repository.findByFoodCalorieGreaterThan(0);
+				List<Bubble> bubbles = new ArrayList<Bubble>();
+				
+				resultFoods.forEach(food -> {
+					System.out.println("food: " + food.getFoodName());
+					bubbles.add(createBubble(food.getFoodName(), food.getFoodCalorie()));
+				});
+
+				Carousel testFlexMessage = new Carousel(bubbles);
+				return new FlexMessage("食品名", testFlexMessage);
 			}else {
 				currentState = currentState.cancel();
 				return new TextMessage("キャンセルします");
 			}
-			
-		case BROWSE_RECORD:
-			List<Bubble> listBubble = new ArrayList<Bubble>();
-			Box body = Box.builder()
-			        .layout(FlexLayout.VERTICAL)
-			        .contents(
-			        		Text.builder()
-			                .text("Test Message")
-			                .size(FlexFontSize.XL)
-			                .weight(Text.TextWeight.BOLD)
-			                .build()
-			        )
-			        .build();
-			Bubble bubble = Bubble.builder()
-				.body(body)
-				.build();
-			listBubble.add(bubble);
-			listBubble.add(bubble);
-			Carousel testFlexMessage = new Carousel(listBubble);
-			return new FlexMessage("hoge", testFlexMessage);
-			
+	
 		}
 		
 		return new TextMessage(event.getMessage().getText());
@@ -192,6 +183,31 @@ public class MessageHandler {
 	@Transactional(readOnly=false)
 	private void changeDB () {
 		repository.saveAndFlush(myData);
+	}
+	
+	private Bubble createBubble(String foodName, Integer foodCalorie) {
+		Text textFoodName = Text.builder()
+	        .text(foodName)
+	        .size(FlexFontSize.XL)
+	        .weight(Text.TextWeight.BOLD)
+	        .build();
+		Text textFoodCalorie = Text.builder()
+	        .text(foodCalorie.toString())
+	        .size(FlexFontSize.XL)
+	        .weight(Text.TextWeight.BOLD)
+	        .build();
+		ArrayList<FlexComponent> contentBodies = new ArrayList<FlexComponent>();
+		contentBodies.add(textFoodName);
+		contentBodies.add(textFoodCalorie);
+		
+		Box body = Box.builder()
+		        .layout(FlexLayout.VERTICAL)
+		        .contents(contentBodies)
+		        .build();
+
+		return Bubble.builder()
+			.body(body)
+			.build();
 	}
 	
 }
