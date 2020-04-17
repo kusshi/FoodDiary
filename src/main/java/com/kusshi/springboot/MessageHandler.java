@@ -149,26 +149,24 @@ public class MessageHandler {
 				return new TextMessage("キャンセルします");
 			}
 			
-		case START_BROWSING_RECORD:
+		case BROWSE_FOOD_RECORD:
 			if(event.getMessage().getText().equals("はい")) {
 				currentState = currentState.accept();
-				return new TextMessage("閲覧します");
+				List<MyData> resultFoods = repository.findByFoodCalorieGreaterThan(0);
+				List<Bubble> bubbles = new ArrayList<Bubble>();
+				
+				resultFoods.forEach(food -> {
+					System.out.println("food: " + food.getFoodName());
+					bubbles.add(createBubble(food.getFoodName()));
+				});
+
+				Carousel testFlexMessage = new Carousel(bubbles);
+				return new FlexMessage("食品名", testFlexMessage);
 			}else {
 				currentState = currentState.cancel();
 				return new TextMessage("キャンセルします");
 			}
-			
-		case BROWSE_RECORD:
-			List<MyData> resultFoods = repository.findByFoodCalorieGreaterThan(0);
-			List<Bubble> bubbles = new ArrayList<Bubble>();
-			
-			resultFoods.forEach(food -> {
-				System.out.println("food: " + food.getFoodName());
-				bubbles.add(createBubble(food.getFoodName()));
-			});
-
-			Carousel testFlexMessage = new Carousel(bubbles);
-			return new FlexMessage("食品名", testFlexMessage);
+	
 		}
 		
 		return new TextMessage(event.getMessage().getText());

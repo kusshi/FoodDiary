@@ -10,7 +10,7 @@ public enum State {
 		
 		@Override
 		public State browse() {
-			return START_BROWSING_RECORD;
+			return BROWSE_FOOD_RECORD;
 		}
 		
 		@Override 
@@ -94,20 +94,7 @@ public enum State {
 		
 	},
 	
-	START_BROWSING_RECORD {
-		@Override
-		public State accept() {
-			return BROWSE_RECORD;
-		}
-		
-		@Override 
-		public State cancel() {
-			return INITIAL;
-		}
-		
-	},
-	
-	BROWSE_RECORD {
+	BROWSE_FOOD_RECORD {
 		@Override
 		public State accept() {
 			return INITIAL;
