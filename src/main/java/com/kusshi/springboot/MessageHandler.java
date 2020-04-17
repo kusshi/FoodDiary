@@ -31,8 +31,8 @@ import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 
 import java.awt.CardLayout;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.time.LocalDateTime;
 
 
 @LineMessageHandler
@@ -121,12 +121,13 @@ public class MessageHandler {
 			if(event.getMessage().getText().equals("はい")) {
 				myData.setFoodCalorie(foodCalorie);
 				// ここでタイムスタンプ取得
-				Date time = new Date();
-				currentTime = time.toString();
-				myData.setTime(currentTime);
+				LocalDateTime foodRegistrationTime = LocalDateTime.now();
+				myData.setYear(foodRegistrationTime.getYear());
+				myData.setMonth(foodRegistrationTime.getMonthValue());
+				myData.setDayOfMonth(foodRegistrationTime.getDayOfMonth());
 				currentState = currentState.accept();
 				return new TemplateMessage("入力確認用テンプレートメッセージ",
-						new ConfirmTemplate(foodName + "(" + foodCalorie + ")" + ":" + currentTime + "を登録しますか？",
+						new ConfirmTemplate(foodName + "(" + foodCalorie + ")を登録しますか？",
 								new MessageAction("はい", "はい"),
 								new MessageAction("いいえ", "いいえ")
 								)
@@ -142,7 +143,7 @@ public class MessageHandler {
 				// repository.saveAndFlush(myData);
 				this.changeDB();
 				currentState = currentState.accept();
-				return new TextMessage(foodName + "(" + foodCalorie + ")" + ":" + currentTime + "を登録しました");
+				return new TextMessage(foodName + "(" + foodCalorie + ")を登録しました");
 			}else {
 				foodCalorie = 0;
 				currentState = currentState.cancel();
