@@ -18,6 +18,7 @@ import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.flex.component.Box;
+import com.linecorp.bot.model.message.flex.component.FlexComponent;
 import com.linecorp.bot.model.message.flex.component.Text;
 import com.linecorp.bot.model.message.flex.container.Bubble;
 import com.linecorp.bot.model.message.flex.container.Carousel;
@@ -158,7 +159,7 @@ public class MessageHandler {
 				
 				resultFoods.forEach(food -> {
 					System.out.println("food: " + food.getFoodName());
-					bubbles.add(createBubble(food.getFoodName()));
+					bubbles.add(createBubble(food.getFoodName(), food.getFoodCalorie()));
 				});
 
 				Carousel testFlexMessage = new Carousel(bubbles);
@@ -184,17 +185,26 @@ public class MessageHandler {
 		repository.saveAndFlush(myData);
 	}
 	
-	private Bubble createBubble(String foodName) {
+	private Bubble createBubble(String foodName, Integer foodCalorie) {
+		Text textFoodName = Text.builder()
+	        .text(foodName)
+	        .size(FlexFontSize.XL)
+	        .weight(Text.TextWeight.BOLD)
+	        .build();
+		Text textFoodCalorie = Text.builder()
+	        .text(foodCalorie.toString())
+	        .size(FlexFontSize.XL)
+	        .weight(Text.TextWeight.BOLD)
+	        .build();
+		ArrayList<FlexComponent> contentBodies = new ArrayList<FlexComponent>();
+		contentBodies.add(textFoodName);
+		contentBodies.add(textFoodCalorie);
+		
 		Box body = Box.builder()
 		        .layout(FlexLayout.VERTICAL)
-		        .contents(
-		        		Text.builder()
-		                .text(foodName)
-		                .size(FlexFontSize.XL)
-		                .weight(Text.TextWeight.BOLD)
-		                .build()
-		        )
+		        .contents(contentBodies)
 		        .build();
+
 		return Bubble.builder()
 			.body(body)
 			.build();
